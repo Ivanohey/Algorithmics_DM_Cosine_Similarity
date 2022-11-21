@@ -1,4 +1,6 @@
 from ressources.stopwords import stopwords as stopwords_list
+import string
+import math
 
 #Define variables
 filename = "./ressources/ref-sentences.txt"
@@ -11,12 +13,13 @@ wordlist = ["spain", "anchovy", "france", "internet", "china", "mexico", "fish",
 def read_reference_text(filename:str):
     f = open(filename)
     sentence_list = []
-    # Add each line in a list and converts all chars to lowercase
     for line in f:
-        sentence_list.append(line.lower())
+        #We get rid of all punctuation and transform to lowercase
+        nopunct = line.translate(str.maketrans('','',string.punctuation))
+        sentence_list.append(nopunct.lower())
+        #sentence_list.append(line.lower())
     f.close()
     return sentence_list
-
 
 def make_word_vector(w: str, list: list[str]):
     reference_word = w
@@ -42,14 +45,26 @@ def make_word_vector(w: str, list: list[str]):
                         word_dictionary.update({word: word_dictionary[word]+1})
                     else:
                         word_dictionary[word] = 1
-                print(word_dictionary)
+
     return word_dictionary
 
 
-def sim_word_vect(v1: dict[str, int], v2:dict[str, int]):
-    similarity = 0.0
+def sim_word_vect(s1: str, s2:str)-> float:
+    v1 = make_word_vector(s1, read_reference_text(filename))
+    v2 = make_word_vector(s2, read_reference_text(filename))
+    similarity = product(v1, v2) / (math.sqrt(product(v1, v1)* product(v2, v2)))
     return similarity
+def product(v1: dict[str, int], v2: dict[str,int]) -> float:
+    sp = 0.0
+    for word in v1:
+        sp += v1[word] * v2.get(word, 0)
+    return sp
 
-#We execute the file
-#read_reference_text(filename)
-make_word_vector("canada", read_reference_text(filename))
+
+
+
+
+#We compute the cosine similarity
+result = sim_word_vect("nato", "countries")
+print(result)
+
