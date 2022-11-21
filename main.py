@@ -141,4 +141,5 @@ def get_highest_similarities(wordlist, cosinelist):
 
 #We compute the cosine similarity
 get_highest_similarities(wordlist, compute_all_similarities(wordlist))
+print("Process finished. Please find the results in the highest_results_only.txt")
 
